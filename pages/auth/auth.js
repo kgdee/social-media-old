@@ -4,6 +4,8 @@ async function initPage() {
   for (const component of [Toast]) {
     await component.init();
   }
+
+  await window.handleAuthAction?.();
 }
 
 async function signup(event) {

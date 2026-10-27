@@ -30,10 +30,10 @@ const Firebase = (() => {
   globalThis.currentAuthUser = null;
   globalThis.currentUser = null;
 
-  const actionCodeSettings = {
-    url: "http://127.0.0.1:5500/pages/auth/action.html",
-    handleCodeInApp: true,
-  };
+  // const actionCodeSettings = {
+  //   url: "http://127.0.0.1:5500/pages/auth/action.html",
+  //   handleCodeInApp: false,
+  // };
 
   function init() {
     app = firebase.initializeApp(firebaseConfig);
@@ -115,7 +115,7 @@ const Firebase = (() => {
     try {
       const userCredential = await auth.createUserWithEmailAndPassword(data.email, data.password);
       const user = userCredential.user;
-      await user.sendEmailVerification(actionCodeSettings);
+      await user.sendEmailVerification();
 
       notify("Account created successfully.");
       return user;
@@ -132,10 +132,18 @@ const Firebase = (() => {
       handleError(error);
     }
   }
+  
+  async function applyActionCode() {
+    try {
+      await auth.applyActionCode(oobCode);
+    } catch (error) {
+      handleError(error);
+    }
+  }
 
   async function sendPasswordResetEmail(email) {
     try {
-      await auth.sendPasswordResetEmail(email, actionCodeSettings);
+      await auth.sendPasswordResetEmail(email);
       notify("Password reset email sent.");
     } catch (error) {
       handleError(error);
@@ -143,20 +151,26 @@ const Firebase = (() => {
   }
 
   async function resetPassword(oobCode, newPassword, confirmPassword) {
-    if (newPassword !== confirmPassword) {
-      throw new Error("Passwords do not match.");
-    }
-
-    if (!oobCode) {
-      throw new Error("Invalid or missing password reset code.");
-    }
-
     try {
+      if (newPassword !== confirmPassword) {
+        throw new Error("Passwords do not match.");
+      }
+
       await auth.confirmPasswordReset(oobCode, newPassword);
 
       notify("New password set successfully.");
 
       return true;
+    } catch (error) {
+      handleError(error);
+    }
+  }
+
+  async function verifyPasswordResetCode(oobCode) {
+    try {
+      const email = await auth.verifyPasswordResetCode(oobCode);
+      notify("Password reset code verified.");
+      return email;
     } catch (error) {
       handleError(error);
     }
@@ -565,8 +579,10 @@ const Firebase = (() => {
     loginWithGoogle,
     signup,
     logout,
+    applyActionCode,
     sendPasswordResetEmail,
     resetPassword,
+    verifyPasswordResetCode,
     getUser,
     loadUsers,
     loadUser,

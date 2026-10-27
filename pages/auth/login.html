@@ -22,7 +22,7 @@
   </head>
   <body>
     <div class="app container auth-page">
-      <img src="/assets/images/logo.png" class="logo" />
+      <img src="/assets/images/logo.png" class="logo" onclick="changePage()" />
 
       <div class="hero-section">
         <img src="/assets/images/collage.png" class="collage-img" />
@@ -52,7 +52,7 @@
 
           <button class="login-btn button" onclick="loginWithGoogle()"><img src="/assets/images/google.png" />Continue with Google</button>
 
-          <a href="#" class="forgot-link">Forgotten password?</a>
+          <div class="password-reset-link" onclick="changePage('password-reset')">Forgotten password?</div>
 
           <div class="acc-link" onclick="changePage('signup')">Create new account</div>
         </div>

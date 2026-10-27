@@ -22,7 +22,8 @@ async function onAuthStateChanged(user) {
   if (currentAuthUser) await Firebase.syncUser();
   else currentUser = null;
 
-  protectPage();
+  const isPassed = protectPage();
+  if (!isPassed) return;
   await window.initPage?.();
 
   if (currentUser) await Firebase.loadUser(currentUser.id, (user) => updateUI);
@@ -31,6 +32,10 @@ async function onAuthStateChanged(user) {
 }
 
 function changePage(name, params = "") {
+  if (!name) {
+    window.location.href = "/";
+    return;
+  }
   const isAuth = ["signup", "login", "password-reset", "action"].includes(name);
   const targetPath = `/pages/${isAuth ? "auth" : name}/${name}.html`;
   if (window.location.pathname.includes(targetPath)) return;
@@ -45,7 +50,9 @@ function protectPage() {
   // If they are NOT logged in and NOT on a public page, redirect to login.
   if (!currentAuthUser && !publicPages.some((item) => currentPath.includes(`/${item}.html`))) {
     changePage("login");
+    return false;
   }
+  return true;
 }
 
 function loading(state = true) {

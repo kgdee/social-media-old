@@ -1,40 +1,35 @@
-const oobCode = urlParams.get("oobCode");
 const mode = urlParams.get("mode");
+const oobCode = urlParams.get("oobCode");
 
 function toggleView(name) {
-  document.querySelectorAll(".view").classList.toggle("hidden", true);
+  document.querySelectorAll(".view").forEach((el) => el.classList.toggle("hidden", true));
   document.querySelector(`.view.${name}`).classList.toggle("hidden", false);
-}
-
-function toggleSuccessView(desc) {
-  // document.querySelector(".view.success .desc").textContent = desc;
-  // toggleView("success");
 }
 
 async function handleAuthAction() {
   switch (mode) {
     case "resetPassword":
       // Verify password reset code
-      const email = await auth.verifyPasswordResetCode(oobCode);
-      emailInput.value = email;
+      const email = await Firebase.verifyPasswordResetCode(oobCode);
+      if (!email) {
+        toggleView("invalid");
+        break;
+      }
+      document.querySelector(".reset-password .title").innerHTML = `Change password for <span>${email}</span>`;
 
       toggleView("reset-password");
       break;
 
     case "verifyEmail":
+      await Firebase.applyActionCode(oobCode);
       toggleView("verify-email");
-
-      await auth.applyActionCode(oobCode);
-
-      toggleSuccessView("Your email address has been successfully verified! Thank you.");
+      Toast.show("Your email address has been successfully verified! Thank you.");
       break;
 
     case "recoverEmail":
+      await Firebase.applyActionCode(oobCode);
       toggleView("recover-email");
-
-      await auth.applyActionCode(oobCode);
-
-      toggleSuccessView("Your email address change has been successfully reverted and secured.");
+      Toast.show("Your email address change has been successfully reverted and secured.");
       break;
 
     default:
@@ -43,23 +38,17 @@ async function handleAuthAction() {
   }
 }
 
-// Submit the new password
 async function resetPassword(event) {
   event.preventDefault();
 
   if (isLoading) return;
   loading(true);
 
-  // Extract the oobCode from the URL query string
-  const oobCode = urlParams.get("mode") === "resetPassword" ? urlParams.get("oobCode") : null;
-
   const formData = new FormData(event.target);
   const data = Object.fromEntries(formData);
 
-  await Firebase.resetPassword(oobCode, data.newPassword, data.confirmPassword);
+  const succeeded = await Firebase.resetPassword(oobCode, data.newPassword, data.confirmPassword);
 
-  // await sleep(3000);
-  // changePage("login");
-  // event.target.reset();
+  if (succeeded) toggleView("reset-password-success");
   loading(false);
 }
