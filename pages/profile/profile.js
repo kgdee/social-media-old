@@ -1,13 +1,14 @@
 const profileDisplay = document.querySelector(".profile-display");
 const postList = document.querySelector(".post-list");
+const msgOverlay = document.querySelector(".msg-overlay");
 
 let targetUser = null;
 let isOwner = false;
 let currentPosts = [];
 
 async function initPage() {
-  await loadResources(PROFILE_PAGE_RES);
-  for (const component of [Toast, Navbar, CreatePostModal, PostModal, ProfileModal, ConfirmModal, MenuModal, SettingsModal]) {
+  await loadResources(RESOURCES.profile);
+  for (const component of [Navbar, CreatePostModal, PostModal, ProfileModal, ConfirmModal, MenuModal, SettingsModal]) {
     await component.init();
   }
 
@@ -19,7 +20,10 @@ async function checkUrl() {
 
   if (userId) {
     const user = await Firebase.getUser(userId);
-    if (!user) return;
+    if (!user) {
+      msgOverlay.classList.toggle("hidden", false);
+      return;
+    }
 
     Firebase.loadUser(user.id, onUserLoaded);
   } else {

@@ -69,4 +69,19 @@
     background-color: var(--color-bg);
     border-radius: 4px;
   }
+
+  .msg-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background-color: var(--color-bg);
+  }
+
+  .msg-overlay .link {
+    color: var(--color-blue);
+  }
 }

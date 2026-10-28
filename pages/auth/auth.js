@@ -1,10 +1,4 @@
 async function initPage() {
-  await loadResources(AUTH_PAGE_RES);
-  
-  for (const component of [Toast]) {
-    await component.init();
-  }
-
   await window.handleAuthAction?.();
 }
 

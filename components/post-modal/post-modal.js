@@ -24,7 +24,7 @@ const PostModal = (() => {
     loading(true);
     currentPost = getPost(postId) || (await Firebase.getPost(postId));
     const author = await Firebase.getUser(authorId);
-
+    
     titleEl.textContent = `${getUserName(author)}'s post`;
 
     refresh();

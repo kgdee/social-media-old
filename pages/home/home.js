@@ -3,9 +3,9 @@ const postList = document.querySelector(".post-list");
 let currentPosts = [];
 
 async function initPage() {
-  await loadResources(HOME_PAGE_RES);
+  await loadResources(RESOURCES.home);
 
-  for (const component of [Toast, Navbar, CreatePostModal, PostModal, ProfileModal, ConfirmModal, MenuModal, SettingsModal]) {
+  for (const component of [Navbar, CreatePostModal, PostModal, ProfileModal, ConfirmModal, MenuModal, SettingsModal]) {
     await component.init();
   }
 

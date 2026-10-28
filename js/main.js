@@ -8,25 +8,30 @@ let currentSettings = load("currentSettings", {
   darkTheme: false,
 });
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  loading(true);
+  await loadResources(RESOURCES.utils);
+  for (const component of [LoadingOverlay, Toast]) {
+    await component.init();
+  }
+
+  loadingWithOverlay(true);
+
   Firebase.init();
   updateUI();
 });
 
 async function onAuthStateChanged(user) {
-  await LoadingOverlay.init();
-  loadingWithOverlay(true);
-
   currentAuthUser = user;
 
-  if (currentAuthUser) await Firebase.syncUser();
+  if (currentAuthUser) await Firebase.syncCurrentUser();
   else currentUser = null;
 
   const isPassed = protectPage();
   if (!isPassed) return;
   await window.initPage?.();
 
-  if (currentUser) await Firebase.loadUser(currentUser.id, (user) => updateUI);
+  if (currentUser) await Firebase.loadCurrentUser();
 
   loadingWithOverlay(false);
 }

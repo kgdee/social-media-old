@@ -186,6 +186,13 @@ textarea {
   color: var(--color-text-muted);
 }
 
+.link {
+  cursor: pointer;
+}
+.link:hover {
+  text-decoration: underline;
+}
+
 @scope (.toggle) {
   :scope {
     position: relative;

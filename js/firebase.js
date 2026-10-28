@@ -60,7 +60,7 @@ const Firebase = (() => {
     return true;
   }
 
-  async function syncUser() {
+  async function syncCurrentUser() {
     try {
       const userId = currentAuthUser.uid;
       const userRef = db.collection("users").doc(userId);
@@ -132,7 +132,7 @@ const Firebase = (() => {
       handleError(error);
     }
   }
-  
+
   async function applyActionCode() {
     try {
       await auth.applyActionCode(oobCode);
@@ -205,6 +205,25 @@ const Firebase = (() => {
           const user = { id: snapshot.id, email: currentUser.email, ...docData };
 
           onLoaded(user);
+        }
+      },
+      (error) => handleError(error),
+    );
+  }
+
+  function loadCurrentUser() {
+    const userId = currentUser.id;
+    const userRef = db.collection("users").doc(userId);
+
+    if (unsubscribe.currentUser) unsubscribe.currentUser();
+    unsubscribe.currentUser = userRef.onSnapshot(
+      (snapshot) => {
+        if (snapshot.exists) {
+          const docData = snapshot.data();
+          const user = { id: snapshot.id, email: currentUser.email, ...docData };
+
+          currentUser = user;
+          updateUI();
         }
       },
       (error) => handleError(error),
@@ -293,8 +312,23 @@ const Firebase = (() => {
     const userRef = db.collection("users").doc(userId);
 
     try {
-      await userRef.delete();
+      // Query and delete all data associated with this user
+      const postsQS = await db.collection("posts").where("authorId", "==", userId).get();
 
+      const batch = db.batch();
+
+      // Add all posts to the batch
+      postsQS.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+
+      // Add the user doc to the same batch
+      batch.delete(userRef);
+
+      // Commit all deletions together
+      await batch.commit();
+
+      // Delete the user from Firebase Authentication
       await auth.currentUser.delete();
 
       notify("User deleted successfully.");
@@ -574,7 +608,7 @@ const Firebase = (() => {
 
   return {
     init,
-    syncUser,
+    syncCurrentUser,
     login,
     loginWithGoogle,
     signup,
@@ -584,8 +618,9 @@ const Firebase = (() => {
     resetPassword,
     verifyPasswordResetCode,
     getUser,
-    loadUsers,
     loadUser,
+    loadCurrentUser,
+    loadUsers,
     setUser,
     isUserFollowed,
     followUser,

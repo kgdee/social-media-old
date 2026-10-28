@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="/css/utils.css" />
     <link rel="stylesheet" href="/css/main.css" />
     <link rel="stylesheet" href="auth.css" />
-    <link rel="stylesheet" href="/components/loading-overlay/loading-overlay.css" />
     <script src="/vendor/firebasejs-10.10.0/firebase-app-compat.js" defer></script>
     <script src="/vendor/firebasejs-10.10.0/firebase-auth-compat.js" defer></script>
     <script src="/vendor/firebasejs-10.10.0/firebase-firestore-compat.js" defer></script>
@@ -18,7 +17,6 @@
     <script src="/js/firebase.js" defer></script>
     <script src="/js/main.js" defer></script>
     <script src="auth.js" defer></script>
-    <script src="/components/loading-overlay/loading-overlay.js" defer></script>
   </head>
   <body>
     <div class="app container auth-page">
@@ -52,7 +50,7 @@
 
           <button class="login-btn button" onclick="loginWithGoogle()"><img src="/assets/images/google.png" />Continue with Google</button>
 
-          <div class="password-reset-link" onclick="changePage('password-reset')">Forgotten password?</div>
+          <div class="link password-reset-link" onclick="changePage('password-reset')">Forgotten password?</div>
 
           <div class="acc-link" onclick="changePage('signup')">Create new account</div>
         </div>
@@ -63,7 +61,7 @@
         </div>
       </div>
 
-      <div class="toast hidden"></div>
+      <div class="toast"></div>
       <div class="loading-overlay"></div>
     </div>
   </body>
